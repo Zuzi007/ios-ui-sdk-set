@@ -219,7 +219,7 @@
             formatedMsg = [formatedMsg substringToIndex:500];
             formatedMsg = [formatedMsg stringByAppendingString:@"..."];
         }else if(formatedMsg.length == 0){
-            formatedMsg = [RCKitUtility localizedDescription:messageContent];
+            formatedMsg = @"";
         }
         return formatedMsg;
     } else {
@@ -965,6 +965,8 @@
         message =
             [NSString stringWithFormat:RCLocalizedString(isMeOperate ? @"GroupHaveDismiss" : @"GroupDismiss"),
                                        nickName];
+    } else {
+        message = groupNotification.message;
     }
     return message;
 }

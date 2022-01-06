@@ -20,7 +20,7 @@ function update_sdk(){
         if [ ${build_host} = "rce" ];
         then
                 cp /var/lib/jenkins/jobs/iOS-SDK-Release/builds/${Release_Node}/archive/output/${src_name}_SourceCode_*.zip ./
-        elif [ ${build_host} = "KSSH2-RC-DF-Base-JenkinsCICD-25-200" ];
+        elif [ ${build_host} = "UCBJ2-RC-Tools-CM-Jenkins-CICD-10-205" ];
         then
                 cp /data/jenkins/jobs/iOS-SDK-Release/builds/${Release_Node}/archive/output/${src_name}_SourceCode_*.zip ./
         else
@@ -40,12 +40,19 @@ update_sdk RongiFlyKit iFlyKit
 update_sdk RongContactCard ContactCard
 update_sdk RongCallKit CallKit
 
-## 剔除 ifly 的敏感信息
 if [[ "$OSTYPE" == "darwin"* ]]; then
+  ## 剔除 ifly 的敏感信息
   sed -i '' -e 's?^#define iFlyKey.*$?#define iFlyKey @\"\"?' iFlyKit/Extention/RCiFlyKitExtensionModule.m
+  ## 修改 RCIMKitVersion
+  sed -i '' -e 's?^static NSString \*const RCIMKitVersion.*$?static NSString *const RCIMKitVersion = @\"'$Version'_opensource\";?' IMKit/RCIM.m
+  ## 修改 __RongCallKit__Version
+  sed -i '' -e 's?^static NSString \*const __RongCallKit__Version.*$?static NSString *const __RongCallKit__Version = @\"'$Version'_opensource\";?' CallKit/RCCall.mm
 else
   sed -i -e 's?^#define iFlyKey.*$?#define iFlyKey @\"\"?' iFlyKit/Extention/RCiFlyKitExtensionModule.m
+  sed -i -e 's?^static NSString \*const RCIMKitVersion.*$?static NSString *const RCIMKitVersion = @\"'$Version'_opensource\";?' IMKit/RCIM.m
+  sed -i -e 's?^static NSString \*const __RongCallKit__Version.*$?static NSString *const __RongCallKit__Version = @\"'$Version'_opensource\";?' CallKit/RCCall.mm
 fi
+
 
 ## 3. 删除重复存在的 .h
 

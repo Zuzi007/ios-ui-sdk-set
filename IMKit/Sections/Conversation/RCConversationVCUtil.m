@@ -21,6 +21,11 @@
 #import "RCHQVoiceMessageCell.h"
 #import "RCKitConfig.h"
 #import "RCSightMessage+imkit.h"
+#import "RCConversationDataSource.h"
+
+@interface RCConversationViewController ()
+@property (nonatomic, strong, readonly) RCConversationDataSource *dataSource;
+@end
 
 @interface RCConversationVCUtil ()
 @property (nonatomic, weak) RCConversationViewController *chatVC;
@@ -125,11 +130,24 @@
 }
 
 - (void)figureOutLatestModel:(RCMessageModel *)model {
-    if (self.chatVC.conversationDataRepository.count > 0) {
+    if ([model.content isKindOfClass:RCOldMessageNotificationMessage.class]) {
+        model.isDisplayMessageTime = NO;
+        return;
+    }
+    NSMutableArray *messageArr = [NSMutableArray new];
+    if(self.chatVC.conversationDataRepository.count > 0) {
+        [messageArr addObjectsFromArray:self.chatVC.conversationDataRepository];
+    }
+    if (self.chatVC.dataSource.cachedReloadMessages.count > 0) {
+        [messageArr addObjectsFromArray:self.chatVC.dataSource.cachedReloadMessages];
+    }
+    if (messageArr.count > 0) {
 
-        RCMessageModel *pre_model =
-            [self.chatVC.conversationDataRepository objectAtIndex:self.chatVC.conversationDataRepository.count - 1];
-
+        RCMessageModel *pre_model = messageArr.lastObject;
+        if ([pre_model.content isKindOfClass:RCOldMessageNotificationMessage.class]) {
+            model.isDisplayMessageTime = YES;
+            return;
+        }
         long long previous_time = pre_model.sentTime;
 
         long long current_time = model.sentTime;
@@ -235,7 +253,12 @@
 
 - (BOOL)canReferenceMessage:(RCMessageModel *)message {
     if (!RCKitConfigCenter.message.enableMessageReference || !self.chatVC.chatSessionInputBarControl || self.chatVC.chatSessionInputBarControl.hidden ||
-        self.chatVC.chatSessionInputBarControl.destructMessageMode || self.chatVC.conversationType == ConversationType_CUSTOMERSERVICE) {
+        self.chatVC.chatSessionInputBarControl.destructMessageMode) {
+        return NO;
+    }
+    
+    // 客服、系统会话不支持引用
+    if (self.chatVC.conversationType == ConversationType_CUSTOMERSERVICE || self.chatVC.conversationType == ConversationType_SYSTEM) {
         return NO;
     }
 
@@ -422,12 +445,22 @@
     if ([RCKitUtility isRTL]) {
         imageViewFrame = CGRectMake(temBut.size.width - arrowLeft - arrowWidth, (temBut.size.height- 9)/2, arrowWidth, 9);
     }
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:imageViewFrame];
-    CGPoint center = imageView.center;
-    center.y = sender.center.y;
-    imageView.center = center;
-    imageView.image = RCResourceImage(@"arrow");
-    [senderButton addSubview:imageView];
+
+    UIView *view = [senderButton viewWithTag:1010];
+    if (view) {
+        view.frame = imageViewFrame;
+        CGPoint center = view.center;
+        center.y = sender.center.y;
+        view.center = center;
+    }else{
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:imageViewFrame];
+        CGPoint center = imageView.center;
+        center.y = sender.center.y;
+        imageView.center = center;
+        imageView.image = RCResourceImage(@"arrow");
+        imageView.tag = 1010;
+        [senderButton addSubview:imageView];
+    }
 }
 
 #pragma mark - 回执请求及响应处理， 同步阅读状态

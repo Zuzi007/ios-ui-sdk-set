@@ -158,7 +158,13 @@ NSString *const KNotificationMessageBaseCellUpdateCanReceiptStatus =
             [self.nicknameLabel setText:nil];
         }
     } else {
-        RCUserInfo *userInfo = [[RCUserInfoCacheManager sharedManager] getUserInfo:model.senderUserId];
+        //优先使用 RCMessage.senderUserId 确定用户，控制头像的显示
+        //否则使用 RCMessage.content.senderUserInfo.userId 确定用户，控制头像的显示
+        NSString *userId = model.senderUserId;
+        if (userId.length <= 0) {
+            userId = model.content.senderUserInfo.userId;
+        }
+        RCUserInfo *userInfo = [[RCUserInfoCacheManager sharedManager] getUserInfo:userId];
         model.userInfo = userInfo;
         if (userInfo) {
             if (model.conversationType != ConversationType_Encrypted) {
@@ -775,9 +781,9 @@ NSString *const KNotificationMessageBaseCellUpdateCanReceiptStatus =
     return _messageActivityIndicatorView;
 }
 
-- (UIButton *)messageFailedStatusView{
+- (RCButton *)messageFailedStatusView{
     if (!_messageFailedStatusView) {
-        _messageFailedStatusView = [[UIButton alloc] init];
+        _messageFailedStatusView = [[RCButton alloc] init];
         [_messageFailedStatusView setImage:RCResourceImage(@"sendMsg_failed_tip") forState:UIControlStateNormal];
         _messageFailedStatusView.hidden = YES;
         [_messageFailedStatusView addTarget:self

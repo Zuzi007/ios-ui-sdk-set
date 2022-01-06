@@ -40,6 +40,27 @@ typedef NS_ENUM(NSUInteger, RCCustomerServiceStatus) {
 };
 
 /*!
+ 加载消息类型
+ @discussion added from 5.1.7
+ */
+typedef enum : NSUInteger {
+    /*!
+     同步远端消息成功失败都加载消息
+     */
+    RCConversationLoadMessageTypeAlways,
+    
+    /*!
+     同步远端消息失败时询问是否加载本地消息
+     */
+    RCConversationLoadMessageTypeAsk,
+    
+    /*!
+     同步远端消息成功再加载消息
+     */
+    RCConversationLoadMessageTypeOnlySuccess,
+} RCConversationLoadMessageType;
+
+/*!
  会话页面类
  */
 @interface RCConversationViewController
@@ -258,7 +279,7 @@ typedef NS_ENUM(NSUInteger, RCCustomerServiceStatus) {
 @property (nonatomic, assign) int defaultHistoryMessageCountOfChatRoom;
 
 /*!
- 设置进入会话页面后下拉刷新从远端获取消息的条数，默认是 10。
+ 设置进入会话页面后下拉刷新从远端获取消息的条数，默认是 10，defaultRemoteHistoryMessageCount 传入 1~20 之间的数值。
  @discussion 此属性需要在viewDidLoad之前进行设置。
  */
 @property (nonatomic, assign) int defaultRemoteHistoryMessageCount;
@@ -268,6 +289,15 @@ typedef NS_ENUM(NSUInteger, RCCustomerServiceStatus) {
  @discussion 此属性需要在viewDidLoad之前进行设置。
  */
 @property (nonatomic, assign) int defaultLocalHistoryMessageCount;
+
+/*!
+ 加载消息类型（不支持聊天室）
+ 
+ @discussion 加载消息是先从本地获取历史消息，本地有缺失的情况下会从服务端同步缺失的部分。 从服务端同步失败的时候会返回非 0 的 errorCode，同时把本地能取到的消息回调上去。
+ @discussion 此属性可以控制从服务端同步失败的时候加载消息的方式。
+ @discussion added from 5.1.7
+ */
+@property (nonatomic, assign) RCConversationLoadMessageType loadMessageType;
 
 /*!
  已经选择的所有消息
@@ -370,6 +400,7 @@ typedef NS_ENUM(NSUInteger, RCCustomerServiceStatus) {
  重写此函数，在此函数中取消掉您的上传，并调用uploadListener的cancelBlock告诉融云SDK该发送已经取消。目前仅支持文件消息的取消
  */
 - (void)cancelUploadMedia:(RCMessageModel *)model;
+
 /*!
  重新发送消息
 
@@ -377,8 +408,19 @@ typedef NS_ENUM(NSUInteger, RCCustomerServiceStatus) {
 
  @discussion 发送消息失败，点击小红点时，会将本地存储的原消息实体删除，回调此接口将消息内容重新发送。
  如果您需要重写此接口，请注意调用super。
+ 因 UI 逻辑修改为将原消息移动到会话页面最下方，不删除原消息直接重新发送原消息，但是此方法会重新生成消息发送，故废弃。
  */
-- (void)resendMessage:(RCMessageContent *)messageContent;
+- (void)resendMessage:(RCMessageContent *)messageContent __deprecated_msg("已废弃，请使用 resendMessageWithModel");
+
+/*!
+ 重新发送消息
+
+ @param model 消息的 Model
+
+ @discussion 发送消息失败，点击小红点时，会将原消息移动到会话页面最下方，不删除原消息，直接重新发送该消息。
+ 如果您需要重写此接口，请注意调用 super。
+ */
+- (void)resendMessageWithModel:(RCMessageModel *)model;
 
 #pragma mark 插入消息
 /*!
@@ -432,7 +474,15 @@ typedef NS_ENUM(NSUInteger, RCCustomerServiceStatus) {
  @param status          发送状态，0表示成功，非0表示失败
  @param messageContent   消息内容
  */
-- (void)didSendMessage:(NSInteger)status content:(RCMessageContent *)messageContent;
+- (void)didSendMessage:(NSInteger)status content:(RCMessageContent *)messageContent __deprecated_msg("已废弃，请使用 - (void)didSendMessageModel:(NSInteger)status model:(RCMessageModel *)messageModel");
+
+/*!
+ 发送消息完成的回调
+
+ @param status          发送状态，0表示成功，非0表示失败
+ @param messageContent   消息内容
+ */
+- (void)didSendMessageModel:(NSInteger)status model:(RCMessageModel *)messageModel;
 
 /*!
  取消了消息发送的回调

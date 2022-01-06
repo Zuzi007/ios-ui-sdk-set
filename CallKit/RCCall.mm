@@ -42,9 +42,9 @@
     }
 #endif
 
-static NSString *const __RongCallKit__Version = @"5.1.5.2";
-static NSString *const __RongCallKit__Commit = @"35de5d39";
-static NSString *const __RongCallKit__Time = @"202110131650";
+static NSString *const __RongCallKit__Version = @"5.1.7_opensource";
+static NSString *const __RongCallKit__Commit = @"fbf61999";
+static NSString *const __RongCallKit__Time = @"202112141832";
 
 @interface RCCall () <RCCallReceiveDelegate>
 
@@ -494,38 +494,13 @@ static NSString *const __RongCallKit__Time = @"202110131650";
 
 #pragma mark - alert
 - (void)loadErrorAlertWithoutConfirm:(NSString *)title {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title
-                                                    message:nil
-                                                   delegate:nil
-                                          cancelButtonTitle:nil
-                                          otherButtonTitles:nil];
-    alert.tag = AlertWithoutConfirm;
-    [NSTimer scheduledTimerWithTimeInterval:1.0f
-                                     target:self
-                                   selector:@selector(cancelAlert:)
-                                   userInfo:alert
-                                    repeats:NO];
-    [alert show];
-}
-
-- (void)cancelAlert:(NSTimer *)scheduledTimer {
-    UIAlertView *alert = (UIAlertView *)(scheduledTimer.userInfo);
-    if (alert.tag == AlertWithoutConfirm) {
-        [alert dismissWithClickedButtonIndex:0 animated:NO];
-    }
-    [[UIApplication sharedApplication].delegate.window makeKeyAndVisible];
+    [RCAlertView showAlertController:title message:nil hiddenAfterDelay:1.0f inViewController:nil dismissCompletion:^{
+        [[UIApplication sharedApplication].delegate.window makeKeyAndVisible];
+    }];
 }
 
 - (void)loadErrorAlertWithConfirm:(NSString *)title message:(NSString *)message {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title
-                                                        message:message
-                                                       delegate:nil
-                                              cancelButtonTitle:RCCallKitLocalizedString(@"OK")
-                                              otherButtonTitles:nil];
-        alert.tag = AlertWithConfirm;
-        [alert show];
-    });
+    [RCAlertView showAlertController:title message:message cancelTitle:RCCallKitLocalizedString(@"OK")];
 }
 
 - (void)startReceiveCallVibrate {
