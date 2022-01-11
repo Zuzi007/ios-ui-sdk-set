@@ -134,7 +134,7 @@ static const CGFloat MBDefaultDetailsLabelFontSize = 14.f;
 
 #pragma mark - Show & hide
 
-- (void)showAnimated:(BOOL)animated {
+- (void)rcim_showAnimated:(BOOL)animated {
     MBMainThreadAssert();
     [self.minShowTimer invalidate];
     self.useAnimation = animated;
@@ -1396,23 +1396,23 @@ static const CGFloat MBDefaultDetailsLabelFontSize = 14.f;
         }];
 }
 
-- (void)showAnimated:(BOOL)animated whileExecutingBlock:(dispatch_block_t)block {
+- (void)rcim_showAnimated:(BOOL)animated whileExecutingBlock:(dispatch_block_t)block {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     [self showAnimated:animated whileExecutingBlock:block onQueue:queue completionBlock:NULL];
 }
 
-- (void)showAnimated:(BOOL)animated
+- (void)rcim_showAnimated:(BOOL)animated
  whileExecutingBlock:(dispatch_block_t)block
      completionBlock:(void (^)(void))completion {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     [self showAnimated:animated whileExecutingBlock:block onQueue:queue completionBlock:completion];
 }
 
-- (void)showAnimated:(BOOL)animated whileExecutingBlock:(dispatch_block_t)block onQueue:(dispatch_queue_t)queue {
+- (void)rcim_showAnimated:(BOOL)animated whileExecutingBlock:(dispatch_block_t)block onQueue:(dispatch_queue_t)queue {
     [self showAnimated:animated whileExecutingBlock:block onQueue:queue completionBlock:NULL];
 }
 
-- (void)showAnimated:(BOOL)animated
+- (void)rcim_showAnimated:(BOOL)animated
  whileExecutingBlock:(dispatch_block_t)block
              onQueue:(dispatch_queue_t)queue
      completionBlock:(nullable RCMBProgressHUDCompletionBlock)completion {

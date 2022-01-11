@@ -147,7 +147,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @see animationType
  */
-- (void)showAnimated:(BOOL)animated;
+- (void)rcim_showAnimated:(BOOL)animated;
 
 /**
  * Hides the HUD. This still calls the hudWasHidden: delegate. This is the counterpart of the show: method. Use it to
@@ -415,16 +415,16 @@ NS_ASSUME_NONNULL_BEGIN
                   onTarget:(id)target
                 withObject:(id)object
                   animated:(BOOL)animated __attribute__((deprecated("Use GCD directly.")));
-- (void)showAnimated:(BOOL)animated
+- (void)rcim_showAnimated:(BOOL)animated
  whileExecutingBlock:(dispatch_block_t)block __attribute__((deprecated("Use GCD directly.")));
-- (void)showAnimated:(BOOL)animated
+- (void)rcim_showAnimated:(BOOL)animated
  whileExecutingBlock:(dispatch_block_t)block
      completionBlock:(nullable RCMBProgressHUDCompletionBlock)completion
     __attribute__((deprecated("Use GCD directly.")));
-- (void)showAnimated:(BOOL)animated
+- (void)rcim_showAnimated:(BOOL)animated
  whileExecutingBlock:(dispatch_block_t)block
              onQueue:(dispatch_queue_t)queue __attribute__((deprecated("Use GCD directly.")));
-- (void)showAnimated:(BOOL)animated
+- (void)rcim_showAnimated:(BOOL)animated
  whileExecutingBlock:(dispatch_block_t)block
              onQueue:(dispatch_queue_t)queue
      completionBlock:(nullable RCMBProgressHUDCompletionBlock)completion
