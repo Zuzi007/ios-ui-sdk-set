@@ -59,7 +59,7 @@ static const CGFloat MBDefaultDetailsLabelFontSize = 14.f;
     RCMBProgressHUD *hud = [[self alloc] initWithView:view];
     hud.removeFromSuperViewOnHide = YES;
     [view addSubview:hud];
-    [hud showAnimated:animated];
+    [hud rcim_showAnimated:animated];
     return hud;
 }
 
@@ -1372,7 +1372,7 @@ static const CGFloat MBDefaultDetailsLabelFontSize = 14.f;
 #pragma mark - Show & hide
 
 - (void)show:(BOOL)animated {
-    [self showAnimated:animated];
+    [self rcim_showAnimated:animated];
 }
 
 - (void)hide:(BOOL)animated {
@@ -1386,7 +1386,7 @@ static const CGFloat MBDefaultDetailsLabelFontSize = 14.f;
 #pragma mark - Threading
 
 - (void)showWhileExecuting:(SEL)method onTarget:(id)target withObject:(id)object animated:(BOOL)animated {
-    [self showAnimated:animated
+    [self rcim_showAnimated:animated
         whileExecutingBlock:^{
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
@@ -1398,18 +1398,18 @@ static const CGFloat MBDefaultDetailsLabelFontSize = 14.f;
 
 - (void)rcim_showAnimated:(BOOL)animated whileExecutingBlock:(dispatch_block_t)block {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    [self showAnimated:animated whileExecutingBlock:block onQueue:queue completionBlock:NULL];
+    [self rcim_showAnimated:animated whileExecutingBlock:block onQueue:queue completionBlock:NULL];
 }
 
 - (void)rcim_showAnimated:(BOOL)animated
  whileExecutingBlock:(dispatch_block_t)block
      completionBlock:(void (^)(void))completion {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    [self showAnimated:animated whileExecutingBlock:block onQueue:queue completionBlock:completion];
+    [self rcim_showAnimated:animated whileExecutingBlock:block onQueue:queue completionBlock:completion];
 }
 
 - (void)rcim_showAnimated:(BOOL)animated whileExecutingBlock:(dispatch_block_t)block onQueue:(dispatch_queue_t)queue {
-    [self showAnimated:animated whileExecutingBlock:block onQueue:queue completionBlock:NULL];
+    [self rcim_showAnimated:animated whileExecutingBlock:block onQueue:queue completionBlock:NULL];
 }
 
 - (void)rcim_showAnimated:(BOOL)animated
@@ -1424,7 +1424,7 @@ static const CGFloat MBDefaultDetailsLabelFontSize = 14.f;
             [self cleanUp];
         });
     });
-    [self showAnimated:animated];
+    [self rcim_showAnimated:animated];
 }
 
 - (void)cleanUp {
